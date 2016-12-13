@@ -49,14 +49,20 @@ public class Grid extends Observable {
 	 */
 	private void createAgents() {
 		
-		ArrayList<Agent> array = new ArrayList<Agent>();
+		ArrayList<Agent> arrayAgents = new ArrayList<Agent>();
+		ArrayList<MessageBox> arrayBoxes = new ArrayList<MessageBox>();
 		
-		array.add(new Agent(this, "x", new Position(0, 0), new Position(3, 2)));
-		array.add(new Agent(this, "o", new Position(0, 1), new Position(0, 0)));
-		array.add(new Agent(this, "^", new Position(0, 2), new Position(4, 4)));
-		array.add(new Agent(this, "$", new Position(0, 3), new Position(1, 1)));
+		arrayAgents.add(new Agent(this, 0, "x", new Position(0, 0), new Position(3, 2)));
+		arrayBoxes.add(new MessageBox(0));
+		arrayAgents.add(new Agent(this, 1, "o", new Position(0, 1), new Position(0, 0)));
+		arrayBoxes.add(new MessageBox(1));
+		arrayAgents.add(new Agent(this, 2, "^", new Position(0, 2), new Position(4, 4)));
+		arrayBoxes.add(new MessageBox(2));
+		arrayAgents.add(new Agent(this, 3, "$", new Position(0, 3), new Position(1, 1)));
+		arrayBoxes.add(new MessageBox(3));
 		
-		setListAgents(array);
+		setListAgents(arrayAgents);
+		setListBoxes(arrayBoxes);
 	}
 
 	private void shuffleGrid() {

@@ -1,12 +1,14 @@
 
 public class Agent extends Thread {
 
+	private int idNumber;
 	private Grid grid;
 	private Position finalPosition;
 	private Position currentPosition;
 	private String sigle;
-	
-	public Agent(Grid p_grid, String p_sigle, Position p_pos_i, Position p_pos_f) {
+
+	public Agent(Grid p_grid, int p_idNumber, String p_sigle, Position p_pos_i, Position p_pos_f) {
+		setIdNumber(p_idNumber);
 		setGrid(p_grid);
 		setSigle(p_sigle);
 		setCurrentPosition(p_pos_i);
@@ -46,6 +48,14 @@ public class Agent extends Thread {
 		}
 	}
 
+	public int getIdNumber() {
+		return idNumber;
+	}
+
+	public void setIdNumber(int idNumber) {
+		this.idNumber = idNumber;
+	}
+	
 	public Grid getGrid() {
 		return grid;
 	}
