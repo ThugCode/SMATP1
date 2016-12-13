@@ -1,4 +1,5 @@
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,17 +27,11 @@ public class GridView extends JFrame implements Observer, ActionListener {
 		this.setGrid(p_grid);
 		
 		this.creePanels();
-		this.init();
 		
 		this.setTitle("SMA");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setBounds(500,200,520,500);
 		this.setResizable(false);
-	}
-	
-	public void init()
-	{
-
 	}
 	
 	public void creePanels()
@@ -64,8 +59,8 @@ public class GridView extends JFrame implements Observer, ActionListener {
 			for ( int j = 0 ; j < Grid.N ; j ++ )
 			{
 				this.lesCases[i][j] = new JButton();
-				this.lesCases[i][j].setText("");
-				this.lesCases[i][j].setEnabled(false);
+				this.lesCases[i][j].setFont(new Font("Arial", Font.PLAIN, 50));
+				this.lesCases[i][j].setText(this.grid.getPositionSigle(new Position(i, j)));
 				//this.lesCases[i][j].addActionListener(this);
 				this.panelCases.add(this.lesCases[i][j]);
 			}
@@ -78,6 +73,7 @@ public class GridView extends JFrame implements Observer, ActionListener {
 		this.nouveau.addActionListener(this);
 		
 		this.lancer = new JButton("Lancer");
+		this.lancer.setActionCommand("0");
 		this.lancer.addActionListener(this);
 		
 		this.quitter = new JButton("Quitter");
@@ -93,9 +89,22 @@ public class GridView extends JFrame implements Observer, ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == this.nouveau) {
-			
+			this.grid.reset();
 		} else if(e.getSource() == this.lancer) {
-			this.grid.startAgents();
+			if(this.lancer.getActionCommand() == "0") {
+				this.lancer.setText("Pause");
+				this.lancer.setActionCommand("1");
+				this.grid.startAgents();
+			} else if(this.lancer.getActionCommand() == "1") {
+				this.lancer.setText("Reprendre");
+				this.lancer.setActionCommand("2");
+				this.grid.suspendAgents();
+			} else if(this.lancer.getActionCommand() == "2") {
+				this.lancer.setText("Pause");
+				this.lancer.setActionCommand("1");
+				this.grid.resumeAgents();
+			}
+			
 		} else if(e.getSource() == this.quitter) {
 			System.exit(0);
 		}
@@ -103,7 +112,7 @@ public class GridView extends JFrame implements Observer, ActionListener {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		
+	
 		for ( int i = 0 ; i < Grid.N ; i ++ ) {
 			for ( int j = 0 ; j < Grid.N ; j ++ ) {
 				this.lesCases[i][j].setText(grid.getPositionSigle(new Position(i, j)));

@@ -13,18 +13,34 @@ public class Grid extends Observable {
 	public Grid() {
 		
 		createAgents();
-		System.out.println(toString());
+		reset();
+	}
+	
+	public void reset() {
+		
 		shuffleGrid();
+		
+		System.out.println("Current Grid");
 		System.out.println(toString());
-		System.out.println("Final Gridd");
+		System.out.println("Final Grid");
 		System.out.println(toStringFinal());
-		System.out.println("Current Gridd");
-		System.out.println(toString());
 	}
 	
 	public void startAgents() {
 		for(Agent agent : listAgents) {
 			agent.start();
+		}
+	}
+	
+	public void suspendAgents() {
+		for(Agent agent : listAgents) {
+			agent.suspend();
+		}
+	}
+	
+	public void resumeAgents() {
+		for(Agent agent : listAgents) {
+			agent.resume();
 		}
 	}
 	
@@ -88,23 +104,24 @@ public class Grid extends Observable {
 	public String getPositionSigle(Position pos) {
 		
 		for(Agent agent : listAgents) {
-			if(agent.getCurrentPosition().equals(pos)) 
+			if(agent.getCurrentPosition().equals(pos)) {
 				return agent.getSigle();
+			}
 		}
 		
 		return " ";
 	}
 	
 	public void switchAgent(Position pos1, Position pos2) {
-		
+	
 		Agent agent1 = getPositionAgent(pos1);
 		Agent agent2 = getPositionAgent(pos2);
 		
 		if(agent1 != null) agent1.setCurrentPosition(pos2);
 		if(agent2 != null) agent2.setCurrentPosition(pos1);
 		
-		System.out.println(this.toString());
 		this.setChanged();
+		this.notifyObservers();
 	}
 	
 	public ArrayList<Agent> getListAgents() {

@@ -5,6 +5,6 @@ public class Main {
 		Grid g = new Grid();
 		GridView gv = new GridView(g);
 		g.addObserver(gv);
+		gv.setVisible(true);
 	}
-
 }
