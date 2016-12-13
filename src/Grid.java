@@ -1,18 +1,16 @@
 import java.util.ArrayList;
+import java.util.Observable;
 import java.util.Random;
 
-public class Grid {
+public class Grid extends Observable {
 
 	public static final int N = 5;
 	
-	private Agent[][] gridAgents;
 	private ArrayList<Agent> listAgents;
 	private ArrayList<MessageBox> listBoxes;
 	private int moveCounter;
 	
 	public Grid() {
-		
-		gridAgents = new Agent[N][N];
 		
 		createAgents();
 		System.out.println(toString());
@@ -22,11 +20,12 @@ public class Grid {
 		System.out.println(toStringFinal());
 		System.out.println("Current Gridd");
 		System.out.println(toString());
-		
+	}
+	
+	public void startAgents() {
 		for(Agent agent : listAgents) {
 			agent.start();
 		}
-		
 	}
 	
 	/***
@@ -35,14 +34,12 @@ public class Grid {
 	private void createAgents() {
 		
 		ArrayList<Agent> array = new ArrayList<Agent>();
+		
 		array.add(new Agent(this, "x", new Position(0, 0), new Position(3, 2)));
-		gridAgents[0][0] = array.get(0);
 		array.add(new Agent(this, "o", new Position(0, 1), new Position(0, 0)));
-		gridAgents[0][1] = array.get(1);
 		array.add(new Agent(this, "^", new Position(0, 2), new Position(4, 4)));
-		gridAgents[0][2] = array.get(2);
 		array.add(new Agent(this, "$", new Position(0, 3), new Position(1, 1)));
-		gridAgents[0][3] = array.get(3);
+		
 		setListAgents(array);
 	}
 
@@ -57,21 +54,57 @@ public class Grid {
 		}
 	}
 	
+	public boolean isOccupated(Position pos) {
+		
+		for(Agent agent : listAgents) {
+			if(agent.getCurrentPosition().equals(pos)) 
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean neightboursIsOccupated(Position pos, int iX, int iY) {
+		
+		Position posNeight = new Position(pos.getX()+iX, pos.getY()+iY);
+		for(Agent agent : listAgents) {
+			if(agent.getCurrentPosition().equals(posNeight)) 
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public Agent getPositionAgent(Position pos) {
+		
+		for(Agent agent : listAgents) {
+			if(agent.getCurrentPosition().equals(pos)) 
+				return agent;
+		}
+		
+		return null;
+	}
+	
+	public String getPositionSigle(Position pos) {
+		
+		for(Agent agent : listAgents) {
+			if(agent.getCurrentPosition().equals(pos)) 
+				return agent.getSigle();
+		}
+		
+		return " ";
+	}
+	
 	public void switchAgent(Position pos1, Position pos2) {
 		
-		Agent agent1 = gridAgents[pos1.getX()][pos1.getY()];
-		Agent agent2 = gridAgents[pos2.getX()][pos2.getY()];
+		Agent agent1 = getPositionAgent(pos1);
+		Agent agent2 = getPositionAgent(pos2);
 		
 		if(agent1 != null) agent1.setCurrentPosition(pos2);
 		if(agent2 != null) agent2.setCurrentPosition(pos1);
-		gridAgents[pos1.getX()][pos1.getY()] = agent2;
-		gridAgents[pos2.getX()][pos2.getY()] = agent1;
 		
 		System.out.println(this.toString());
-	}
-	
-	public boolean isEmpty(Position position, int iX, int iY) {
-		return this.gridAgents[position.getX()+iX][position.getY()+iY] == null;
+		this.setChanged();
 	}
 	
 	public ArrayList<Agent> getListAgents() {
@@ -104,10 +137,7 @@ public class Grid {
 		
 		for(int i=0;i<N;i++) {
 			for(int j=0;j<N;j++) {
-				if(this.gridAgents[i][j] != null)
-					retur += "|"+this.gridAgents[i][j].getSigle()+"|";
-				else
-					retur += "| |";
+				retur += "|"+this.getPositionSigle(new Position(i, j))+"|";
 			}
 			retur += "\n";
 		}

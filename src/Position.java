@@ -21,4 +21,16 @@ public class Position {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		
+		if(!(obj instanceof Position)) return false;
+		
+		if(((Position)obj).getX() == this.getX() 
+		&& ((Position)obj).getY() == this.getY())
+			return true;
+		
+		return false;
+	}
 }

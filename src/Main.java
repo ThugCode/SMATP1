@@ -2,8 +2,9 @@
 public class Main {
 
 	public static void main(String[] args) {
-		new Grid();
-
+		Grid g = new Grid();
+		GridView gv = new GridView(g);
+		g.addObserver(gv);
 	}
 
 }

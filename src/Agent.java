@@ -29,7 +29,7 @@ public class Agent extends Thread {
 			
 			if(facteurX() != 0) {
 				int increment = -facteurX()/Math.abs(facteurX());
-				if(this.grid.isEmpty(this.currentPosition, increment, 0)) {
+				if(this.grid.neightboursIsOccupated(this.currentPosition, increment, 0)) {
 					this.grid.switchAgent(this.currentPosition, new Position(this.currentPosition.getX()+increment, this.currentPosition.getY()));
 					deplacement = true;
 				}
@@ -37,7 +37,7 @@ public class Agent extends Thread {
 			
 			if(!deplacement && facteurY() != 0) {
 				int increment = -facteurY()/Math.abs(facteurY());
-				if(this.grid.isEmpty(this.currentPosition, 0, increment)) {
+				if(this.grid.neightboursIsOccupated(this.currentPosition, 0, increment)) {
 					this.grid.switchAgent(this.currentPosition, new Position(this.currentPosition.getX(), this.currentPosition.getY()+increment));
 					deplacement = true;
 				}
