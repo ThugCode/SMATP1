@@ -13,11 +13,16 @@ public class Grid extends Observable {
 	public Grid() {
 		
 		createAgents();
-		reset();
+		start();
 	}
 	
 	public void reset() {
-		
+		createAgents();
+		start();
+	}
+	
+	public void start() {
+				
 		shuffleGrid();
 		
 		System.out.println("Current Grid");
@@ -76,7 +81,7 @@ public class Grid extends Observable {
 		}
 	}
 	
-	public boolean isOccupated(Position pos) {
+	public synchronized boolean isOccupated(Position pos) {
 		
 		for(Agent agent : listAgents) {
 			if(agent.getCurrentPosition().equals(pos)) 
@@ -86,7 +91,7 @@ public class Grid extends Observable {
 		return false;
 	}
 	
-	public boolean neightboursIsOccupated(Position pos, int iX, int iY) {
+	public synchronized boolean neightboursIsOccupated(Position pos, int iX, int iY) {
 		
 		Position posNeight = new Position(pos.getX()+iX, pos.getY()+iY);
 		for(Agent agent : listAgents) {
@@ -118,7 +123,7 @@ public class Grid extends Observable {
 		return " ";
 	}
 	
-	public void switchAgent(Position pos1, Position pos2) {
+	public synchronized void switchAgent(Position pos1, Position pos2) {
 	
 		Agent agent1 = getPositionAgent(pos1);
 		Agent agent2 = getPositionAgent(pos2);

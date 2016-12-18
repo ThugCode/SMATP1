@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class Agent extends Thread {
 
@@ -5,6 +6,7 @@ public class Agent extends Thread {
 	private Grid grid;
 	private Position finalPosition;
 	private Position currentPosition;
+	private Position virtualPosition;
 	private String sigle;
 
 	public Agent(Grid p_grid, int p_idNumber, String p_sigle, Position p_pos_i, Position p_pos_f) {
@@ -14,36 +16,59 @@ public class Agent extends Thread {
 		setCurrentPosition(p_pos_i);
 		setFinalPosition(p_pos_f);
 	}
-	
+
 	private int facteurX() {
 		return this.getCurrentPosition().getX() - this.getFinalPosition().getX();
 	}
-	
+
 	private int facteurY() {
 		return this.getCurrentPosition().getY() - this.getFinalPosition().getY();
 	}
-	
+
+	private int virtualFacteurX() {
+		return this.getVirtualPosition().getX() - this.getFinalPosition().getX();
+	}
+
+	private int virtualFacteurY() {
+		return this.getVirtualPosition().getY() - this.getFinalPosition().getY();
+	}
+
+	private ArrayList<Position> getPath() {
+		this.setVirtualPosition(new Position(this.currentPosition.getX(), this.currentPosition.getY()));
+		ArrayList<Position> positions = new ArrayList<Position>();
+
+		while(virtualFacteurX() != 0) {
+			int increment = -virtualFacteurX()/Math.abs(virtualFacteurX());
+			this.virtualPosition.setX(this.virtualPosition.getX() + increment);
+
+			positions.add(new Position(this.virtualPosition.getX(), this.virtualPosition.getY()));
+		}
+
+		while(virtualFacteurY() != 0) {
+			int increment = -virtualFacteurY()/Math.abs(virtualFacteurY());
+			this.virtualPosition.setY(this.virtualPosition.getY() + increment);
+
+			positions.add(new Position(this.virtualPosition.getX(), this.virtualPosition.getY()));
+		}
+
+		return positions;
+	}
+
 	@Override
 	public void run() {
-		
+		ArrayList<Position> path = getPath();
+		int i = 0;
+
 		while(true) {
-			boolean deplacement = false;
-			
-			if(facteurX() != 0) {
-				int increment = -facteurX()/Math.abs(facteurX());
-				if(!this.grid.neightboursIsOccupated(this.currentPosition, increment, 0)) {
-					this.grid.switchAgent(this.currentPosition, new Position(this.currentPosition.getX()+increment, this.currentPosition.getY()));
-					deplacement = true;
+			if(i < path.size()) {
+				Position p = path.get(i);
+				
+				if(!this.grid.isOccupated(p)) {
+					this.grid.switchAgent(this.currentPosition, p);
+					i++;
 				}
 			}
-			
-			if(!deplacement && facteurY() != 0) {
-				int increment = -facteurY()/Math.abs(facteurY());
-				if(!this.grid.neightboursIsOccupated(this.currentPosition, 0, increment)) {
-					this.grid.switchAgent(this.currentPosition, new Position(this.currentPosition.getX(), this.currentPosition.getY()+increment));
-					deplacement = true;
-				}
-			}
+
 			try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
 		}
 	}
@@ -55,7 +80,7 @@ public class Agent extends Thread {
 	public void setIdNumber(int idNumber) {
 		this.idNumber = idNumber;
 	}
-	
+
 	public Grid getGrid() {
 		return grid;
 	}
@@ -78,6 +103,14 @@ public class Agent extends Thread {
 
 	public void setCurrentPosition(Position currentPosition) {
 		this.currentPosition = currentPosition;
+	}
+
+	public Position getVirtualPosition() {
+		return virtualPosition;
+	}
+
+	public void setVirtualPosition(Position virtualPosition) {
+		this.virtualPosition = virtualPosition;
 	}
 
 	public String getSigle() {

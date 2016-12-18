@@ -89,7 +89,10 @@ public class GridView extends JFrame implements Observer, ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == this.nouveau) {
+			this.grid.suspendAgents();
 			this.grid.reset();
+			this.lancer.setText("Lancer");
+			this.lancer.setActionCommand("0");
 		} else if(e.getSource() == this.lancer) {
 			if(this.lancer.getActionCommand() == "0") {
 				this.lancer.setText("Pause");
