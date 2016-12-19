@@ -111,30 +111,30 @@ public class Grid extends Observable {
 		this.notifyObservers();
 	}
 	
-	public synchronized Position getNeightboorFreePosition(Position pos, Position need) {
+	public synchronized Position getNeightboorFreePosition(Position pos, Position posToAvoid, Position need) {
 		
-		if(need != null) {
+		if(need != null && !need.equals(posToAvoid)) {
 			if(!isOccupated(need)) return need;
 		}
 		
 		if(pos.getX() < N-1) {
 			Position newPosition = new Position(pos.getX()+1, pos.getY());
-			if(!isOccupated(newPosition)) return newPosition;
+			if(!isOccupated(newPosition) && !newPosition.equals(posToAvoid)) return newPosition;
 		}
 		
 		if(pos.getY() < N-1) {
 			Position newPosition = new Position(pos.getX(), pos.getY()+1);
-			if(!isOccupated(newPosition)) return newPosition;
+			if(!isOccupated(newPosition) && !newPosition.equals(posToAvoid)) return newPosition;
 		}
 
 		if(pos.getX() > 0) {
 			Position newPosition = new Position(pos.getX()-1, pos.getY());
-			if(!isOccupated(newPosition)) return newPosition;
+			if(!isOccupated(newPosition) && !newPosition.equals(posToAvoid)) return newPosition;
 		}
 		
 		if(pos.getY() > 0) {
 			Position newPosition = new Position(pos.getX(), pos.getY()-1);
-			if(!isOccupated(newPosition)) return newPosition;
+			if(!isOccupated(newPosition) && !newPosition.equals(posToAvoid)) return newPosition;
 		}
 
 		return null;

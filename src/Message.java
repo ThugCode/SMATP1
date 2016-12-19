@@ -7,16 +7,16 @@ public class Message {
 	private boolean read;
 	private Agent agentFrom;
 	private Agent agentTo;
-	private Position positionToLeave;
+	private Position positionToAvoid;
 	private boolean response;
 	
-	public Message(Agent p_agentFrom, Agent p_agentTo, Position p_positionToLeave) {
+	public Message(Agent p_agentFrom, Agent p_agentTo, Position p_positionToAvoid) {
 		
 		setIdNumber(id);
 		setRead(false);
 		setAgentFrom(p_agentFrom);
 		setAgentTo(p_agentTo);
-		setPositionToLeave(p_positionToLeave);
+		setPositionToLeave(p_positionToAvoid);
 		setResponse(false);
 		id++;
 	}
@@ -53,12 +53,12 @@ public class Message {
 		this.agentTo = agentTo;
 	}
 
-	public Position getPositionToLeave() {
-		return positionToLeave;
+	public Position getPositionToAvoid() {
+		return positionToAvoid;
 	}
 
-	public void setPositionToLeave(Position positionToLeave) {
-		this.positionToLeave = positionToLeave;
+	public void setPositionToLeave(Position positionToAvoid) {
+		this.positionToAvoid = positionToAvoid;
 	}
 
 	public boolean isResponse() {

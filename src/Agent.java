@@ -62,14 +62,15 @@ public class Agent extends Thread {
 			
 			path = getPath();
 			
-			ArrayList<Message> messages = new ArrayList<Message>(this.grid.getListBoxes().get(this.getIdNumber()).getListMessages());
+			
+			ArrayList<Message> messages = this.grid.getListBoxes().get(this.getIdNumber()).getListMessages();
 			for(Message msg : messages) {
 				if(msg.isRead())
 					continue;
-				
+
 				Position need = null;
 				if(path.size() > 0) need = path.get(0);
-				Position newPos = this.grid.getNeightboorFreePosition(msg.getPositionToLeave(), need);
+				Position newPos = this.grid.getNeightboorFreePosition(this.getCurrentPosition(), msg.getPositionToAvoid(), need);
 				if(newPos != null && need != newPos) {
 					path.add(0, newPos);
 					//System.out.println(this.getSigle()+" se déplace en "+newPos.getX()+":"+newPos.getY());
@@ -78,15 +79,19 @@ public class Agent extends Thread {
 			}
 			//this.grid.getListBoxes().get(this.getIdNumber()).removeReadMessages();
 			
+			Position p2 = null;
+
 			if(path.size() > 0) {
 				Position p = path.get(0);
-				
-                Agent neighbor = this.grid.moveAgent(this, p);
-                if(neighbor != null) {
-	                int index = neighbor.getIdNumber();
-	                Message msg = new Message(this, neighbor, p);
-	                this.grid.getListBoxes().get(index).addMessage(msg);
-                }
+				if(path.size() > 1) 
+					p2 = path.get(1);
+
+				Agent neighbor = this.grid.moveAgent(this, p);
+				if(neighbor != null) {
+					int index = neighbor.getIdNumber();
+					Message msg = new Message(this, neighbor, p2);
+					this.grid.getListBoxes().get(index).addMessage(msg);
+				}
 			}
 
 			try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
