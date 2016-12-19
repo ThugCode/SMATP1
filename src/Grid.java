@@ -5,6 +5,11 @@ import java.util.Random;
 public class Grid extends Observable {
 
 	public static final int N = 5;
+	public static final String[] SIGLES = new String[] {"x", "o", "^", "$", "&", 
+														"w", "§", "!", "ç", "@", 
+														"$", "€", "*", "%", "?",
+														"#", "[", "]", "{", "}",
+														":", ".", "=", "+"};
 	
 	private ArrayList<Agent> listAgents;
 	private ArrayList<MessageBox> listBoxes;
@@ -57,26 +62,48 @@ public class Grid extends Observable {
 		ArrayList<Agent> arrayAgents = new ArrayList<Agent>();
 		ArrayList<MessageBox> arrayBoxes = new ArrayList<MessageBox>();
 		
-		arrayAgents.add(new Agent(this, 0, "x", new Position(0, 0), new Position(3, 2)));
-		arrayBoxes.add(new MessageBox(0));
-		arrayAgents.add(new Agent(this, 1, "o", new Position(0, 1), new Position(0, 0)));
-		arrayBoxes.add(new MessageBox(1));
-		arrayAgents.add(new Agent(this, 2, "^", new Position(0, 2), new Position(4, 4)));
-		arrayBoxes.add(new MessageBox(2));
-		arrayAgents.add(new Agent(this, 3, "$", new Position(0, 3), new Position(1, 1)));
-		arrayBoxes.add(new MessageBox(3));
+		int nbAgent = 5;
+		
+		
+		Random rand = new Random();
+		ArrayList<Position> finals = getFinalPositions();
+		Position temp;
+		int x;
+		int y;
+		
+		for(int i=0; i<nbAgent; i++) {
+			x = (int) Math.ceil(i/Grid.N);
+			y = i%Grid.N;
+			temp = finals.get(rand.nextInt(finals.size()-1));
+			finals.remove(temp);
+			arrayAgents.add(new Agent(this, i, Grid.SIGLES[i], new Position(x, y), temp));
+			arrayBoxes.add(new MessageBox(i));
+		}
 		
 		setListAgents(arrayAgents);
 		setListBoxes(arrayBoxes);
+	}
+	
+	private ArrayList<Position> getFinalPositions() {
+		
+		ArrayList<Position> list = new ArrayList<Position>();
+		
+		for(int i=0;i<N;i++) {
+			for(int j=0;j<N;j++) {
+				list.add(new Position(i, j));
+			}
+		}
+		
+		return list;
 	}
 
 	private void shuffleGrid() {
 		
 		Random rand = new Random();
 		
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
-				switchAgent(new Position(i, j), new Position(rand.nextInt(N), rand.nextInt(N)));
+		for(int i=0;i<Grid.N;i++) {
+			for(int j=0;j<Grid.N;j++) {
+				switchAgent(new Position(i, j), new Position(rand.nextInt(Grid.N), rand.nextInt(Grid.N)));
 			}
 		}
 	}
@@ -85,17 +112,6 @@ public class Grid extends Observable {
 		
 		for(Agent agent : listAgents) {
 			if(agent.getCurrentPosition().equals(pos)) 
-				return true;
-		}
-		
-		return false;
-	}
-	
-	public synchronized boolean neightboursIsOccupated(Position pos, int iX, int iY) {
-		
-		Position posNeight = new Position(pos.getX()+iX, pos.getY()+iY);
-		for(Agent agent : listAgents) {
-			if(agent.getCurrentPosition().equals(posNeight)) 
 				return true;
 		}
 		
@@ -163,8 +179,8 @@ public class Grid extends Observable {
 		
 		String retur = "";
 		
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
+		for(int i=0;i<Grid.N;i++) {
+			for(int j=0;j<Grid.N;j++) {
 				retur += "|"+this.getPositionSigle(new Position(i, j))+"|";
 			}
 			retur += "\n";
@@ -178,8 +194,8 @@ public class Grid extends Observable {
 		String retur = "";
 		boolean print;
 		
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
+		for(int i=0;i<Grid.N;i++) {
+			for(int j=0;j<Grid.N;j++) {
 				print = false;
 				for(Agent agent : listAgents) {
 					if(agent.getFinalPosition().getX() == i
