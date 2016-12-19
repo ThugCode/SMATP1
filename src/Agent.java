@@ -56,17 +56,37 @@ public class Agent extends Thread {
 
 	@Override
 	public void run() {
-		ArrayList<Position> path = getPath();
-		int i = 0;
+		ArrayList<Position> path;
 
 		while(true) {
-			if(i < path.size()) {
-				Position p = path.get(i);
+			
+			path = getPath();
+			
+			ArrayList<Message> messages = new ArrayList<Message>(this.grid.getListBoxes().get(this.getIdNumber()).getListMessages());
+			for(Message msg : messages) {
+				if(msg.isRead())
+					continue;
 				
-				if(!this.grid.isOccupated(p)) {
-					this.grid.switchAgent(this.currentPosition, p);
-					i++;
+				Position need = null;
+				if(path.size() > 0) need = path.get(0);
+				Position newPos = this.grid.getNeightboorFreePosition(msg.getPositionToLeave(), need);
+				if(newPos != null && need != newPos) {
+					path.add(0, newPos);
+					//System.out.println(this.getSigle()+" se déplace en "+newPos.getX()+":"+newPos.getY());
+					msg.setRead(true);
 				}
+			}
+			//this.grid.getListBoxes().get(this.getIdNumber()).removeReadMessages();
+			
+			if(path.size() > 0) {
+				Position p = path.get(0);
+				
+                Agent neighbor = this.grid.moveAgent(this, p);
+                if(neighbor != null) {
+	                int index = neighbor.getIdNumber();
+	                Message msg = new Message(this, neighbor, p);
+	                this.grid.getListBoxes().get(index).addMessage(msg);
+                }
 			}
 
 			try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }

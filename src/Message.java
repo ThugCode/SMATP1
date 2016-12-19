@@ -4,6 +4,7 @@ public class Message {
 	private static int id = 1;
 	
 	private int idNumber;
+	private boolean read;
 	private Agent agentFrom;
 	private Agent agentTo;
 	private Position positionToLeave;
@@ -12,6 +13,7 @@ public class Message {
 	public Message(Agent p_agentFrom, Agent p_agentTo, Position p_positionToLeave) {
 		
 		setIdNumber(id);
+		setRead(false);
 		setAgentFrom(p_agentFrom);
 		setAgentTo(p_agentTo);
 		setPositionToLeave(p_positionToLeave);
@@ -27,6 +29,14 @@ public class Message {
 		this.idNumber = idNumber;
 	}
 
+	public boolean isRead() {
+		return read;
+	}
+
+	public void setRead(boolean read) {
+		this.read = read;
+	}
+	
 	public Agent getAgentFrom() {
 		return agentFrom;
 	}

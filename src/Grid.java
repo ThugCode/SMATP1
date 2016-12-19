@@ -62,7 +62,7 @@ public class Grid extends Observable {
 		ArrayList<Agent> arrayAgents = new ArrayList<Agent>();
 		ArrayList<MessageBox> arrayBoxes = new ArrayList<MessageBox>();
 		
-		int nbAgent = 5;
+		int nbAgent = 10;
 		
 		
 		Random rand = new Random();
@@ -103,12 +103,52 @@ public class Grid extends Observable {
 		
 		for(int i=0;i<Grid.N;i++) {
 			for(int j=0;j<Grid.N;j++) {
-				switchAgent(new Position(i, j), new Position(rand.nextInt(Grid.N), rand.nextInt(Grid.N)));
+				switchCases(new Position(i, j), new Position(rand.nextInt(Grid.N), rand.nextInt(Grid.N)));
 			}
 		}
+		
+		this.setChanged();
+		this.notifyObservers();
 	}
 	
-	public synchronized boolean isOccupated(Position pos) {
+	public synchronized Position getNeightboorFreePosition(Position pos, Position need) {
+		
+		if(need != null) {
+			if(!isOccupated(need)) return need;
+		}
+		
+		if(pos.getX() < N-1) {
+			Position newPosition = new Position(pos.getX()+1, pos.getY());
+			if(!isOccupated(newPosition)) return newPosition;
+		}
+		
+		if(pos.getY() < N-1) {
+			Position newPosition = new Position(pos.getX(), pos.getY()+1);
+			if(!isOccupated(newPosition)) return newPosition;
+		}
+
+		if(pos.getX() > 0) {
+			Position newPosition = new Position(pos.getX()-1, pos.getY());
+			if(!isOccupated(newPosition)) return newPosition;
+		}
+		
+		if(pos.getY() > 0) {
+			Position newPosition = new Position(pos.getX(), pos.getY()-1);
+			if(!isOccupated(newPosition)) return newPosition;
+		}
+
+		return null;
+	}
+	
+	private void switchCases(Position pos1, Position pos2) {
+    	Agent agent1 = getAgentToPosition(pos1);
+		Agent agent2 = getAgentToPosition(pos2);
+		
+		if(agent1 != null) agent1.setCurrentPosition(pos2);
+		if(agent2 != null) agent2.setCurrentPosition(pos1);
+	}
+	
+	public boolean isOccupated(Position pos) {
 		
 		for(Agent agent : listAgents) {
 			if(agent.getCurrentPosition().equals(pos)) 
@@ -118,7 +158,7 @@ public class Grid extends Observable {
 		return false;
 	}
 	
-	public Agent getPositionAgent(Position pos) {
+	public Agent getAgentToPosition(Position pos) {
 		
 		for(Agent agent : listAgents) {
 			if(agent.getCurrentPosition().equals(pos)) 
@@ -128,7 +168,7 @@ public class Grid extends Observable {
 		return null;
 	}
 	
-	public String getPositionSigle(Position pos) {
+	public String getSigleToPosition(Position pos) {
 		
 		for(Agent agent : listAgents) {
 			if(agent.getCurrentPosition().equals(pos)) {
@@ -139,16 +179,18 @@ public class Grid extends Observable {
 		return " ";
 	}
 	
-	public synchronized void switchAgent(Position pos1, Position pos2) {
+	public synchronized Agent moveAgent(Agent agent, Position newPos) {
 	
-		Agent agent1 = getPositionAgent(pos1);
-		Agent agent2 = getPositionAgent(pos2);
-		
-		if(agent1 != null) agent1.setCurrentPosition(pos2);
-		if(agent2 != null) agent2.setCurrentPosition(pos1);
-		
-		this.setChanged();
-		this.notifyObservers();
+		Agent neighbor = this.getAgentToPosition(newPos);
+        if(neighbor == null) {
+    		
+    		if(agent != null) agent.setCurrentPosition(newPos);
+    		
+    		this.setChanged();
+    		this.notifyObservers();
+        }
+        
+        return neighbor;
 	}
 	
 	public ArrayList<Agent> getListAgents() {
@@ -181,7 +223,7 @@ public class Grid extends Observable {
 		
 		for(int i=0;i<Grid.N;i++) {
 			for(int j=0;j<Grid.N;j++) {
-				retur += "|"+this.getPositionSigle(new Position(i, j))+"|";
+				retur += "|"+this.getSigleToPosition(new Position(i, j))+"|";
 			}
 			retur += "\n";
 		}

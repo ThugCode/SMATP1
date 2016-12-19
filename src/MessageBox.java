@@ -18,6 +18,13 @@ public class MessageBox {
 		return getListMessages().remove(msg);
 	}
 	
+	public void removeReadMessages() {
+		for(Message msg : listMessages) {
+			if(msg.isRead())
+				listMessages.remove(msg);
+		}
+	}
+	
 	public int getIdNumber() {
 		return idNumber;
 	}

@@ -60,7 +60,7 @@ public class GridView extends JFrame implements Observer, ActionListener {
 			{
 				this.lesCases[i][j] = new JButton();
 				this.lesCases[i][j].setFont(new Font("Arial", Font.PLAIN, 50));
-				this.lesCases[i][j].setText(this.grid.getPositionSigle(new Position(i, j)));
+				this.lesCases[i][j].setText(this.grid.getSigleToPosition(new Position(i, j)));
 				//this.lesCases[i][j].addActionListener(this);
 				this.panelCases.add(this.lesCases[i][j]);
 			}
@@ -118,7 +118,7 @@ public class GridView extends JFrame implements Observer, ActionListener {
 	
 		for ( int i = 0 ; i < Grid.N ; i ++ ) {
 			for ( int j = 0 ; j < Grid.N ; j ++ ) {
-				this.lesCases[i][j].setText(grid.getPositionSigle(new Position(i, j)));
+				this.lesCases[i][j].setText(grid.getSigleToPosition(new Position(i, j)));
 			}
 		}
 	}
