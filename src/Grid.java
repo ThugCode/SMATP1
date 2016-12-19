@@ -2,12 +2,14 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
+
 public class Grid extends Observable {
 
 	public static final int N = 5;
 	public static final String[] SIGLES = new String[] {"x", "o", "^", "$", "&", 
 														"w", "§", "!", "ç", "@", 
-														"$", "€", "*", "%", "?",
+														"<", "€", "*", "%", "?",
 														"#", "[", "]", "{", "}",
 														":", ".", "=", "+"};
 	
@@ -62,21 +64,21 @@ public class Grid extends Observable {
 		ArrayList<Agent> arrayAgents = new ArrayList<Agent>();
 		ArrayList<MessageBox> arrayBoxes = new ArrayList<MessageBox>();
 		
-		int nbAgent = 10;
-		
+		int nbAgent = 15;
 		
 		Random rand = new Random();
 		ArrayList<Position> finals = getFinalPositions();
-		Position temp;
-		int x;
-		int y;
+		ArrayList<ImageIcon> images = ImageCutter.getListImages("smile.jpg");
 		
 		for(int i=0; i<nbAgent; i++) {
-			x = (int) Math.ceil(i/Grid.N);
-			y = i%Grid.N;
-			temp = finals.get(rand.nextInt(finals.size()-1));
-			finals.remove(temp);
-			arrayAgents.add(new Agent(this, i, Grid.SIGLES[i], new Position(x, y), temp));
+			int x = (int) Math.ceil(i/Grid.N);
+			int y = i%Grid.N;
+			int random = rand.nextInt(finals.size()-1);
+			Position tempPosition = finals.get(random);
+			ImageIcon tempImage = images.get(random);
+			finals.remove(tempPosition);
+			images.remove(tempImage);
+			arrayAgents.add(new Agent(this, i, Grid.SIGLES[i], new Position(x, y), tempPosition, tempImage));
 			arrayBoxes.add(new MessageBox(i));
 		}
 		
@@ -168,6 +170,17 @@ public class Grid extends Observable {
 		return null;
 	}
 	
+	public ImageIcon getImageToPosition(Position pos) {
+		
+		for(Agent agent : listAgents) {
+			if(agent.getCurrentPosition().equals(pos)) {
+				return agent.getImage();
+			}
+		}
+		
+		return null;
+	}
+
 	public String getSigleToPosition(Position pos) {
 		
 		for(Agent agent : listAgents) {

@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
+
 public class Agent extends Thread {
 
 	private int idNumber;
@@ -8,13 +10,15 @@ public class Agent extends Thread {
 	private Position currentPosition;
 	private Position virtualPosition;
 	private String sigle;
+	private ImageIcon image;
 
-	public Agent(Grid p_grid, int p_idNumber, String p_sigle, Position p_pos_i, Position p_pos_f) {
+	public Agent(Grid p_grid, int p_idNumber, String p_sigle, Position p_pos_i, Position p_pos_f, ImageIcon p_image) {
 		setIdNumber(p_idNumber);
 		setGrid(p_grid);
 		setSigle(p_sigle);
 		setCurrentPosition(p_pos_i);
 		setFinalPosition(p_pos_f);
+		setImage(p_image);
 	}
 
 	private int facteurX() {
@@ -144,5 +148,13 @@ public class Agent extends Thread {
 
 	public void setSigle(String sigle) {
 		this.sigle = sigle;
+	}
+
+	public ImageIcon getImage() {
+		return image;
+	}
+
+	public void setImage(ImageIcon image) {
+		this.image = image;
 	}
 }

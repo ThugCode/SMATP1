@@ -8,13 +8,14 @@ import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class GridView extends JFrame implements Observer, ActionListener {
 	private static final long serialVersionUID = -6118846850213932379L;
 
 	private Grid grid;
-	private JButton [][] lesCases;
+	private JLabel [][] lesCases;
 	
 	private JPanel panelCases;
 	private JPanel panelBoutons;
@@ -50,18 +51,18 @@ public class GridView extends JFrame implements Observer, ActionListener {
 	
 	public void creePanelCases()
 	{
-		this.lesCases = new JButton[Grid.N][Grid.N];
+		this.lesCases = new JLabel[Grid.N][Grid.N];
 		this.panelCases = new JPanel();
-		this.panelCases.setLayout(new GridLayout(Grid.N,Grid.N,10,10));
+		this.panelCases.setLayout(new GridLayout(Grid.N,Grid.N,1,1));
 		
 		for ( int i = 0 ; i < Grid.N ; i ++ )
 		{
 			for ( int j = 0 ; j < Grid.N ; j ++ )
 			{
-				this.lesCases[i][j] = new JButton();
+				this.lesCases[i][j] = new JLabel();
 				this.lesCases[i][j].setFont(new Font("Arial", Font.PLAIN, 50));
-				this.lesCases[i][j].setText(this.grid.getSigleToPosition(new Position(i, j)));
-				//this.lesCases[i][j].addActionListener(this);
+				//this.lesCases[i][j].setText(this.grid.getSigleToPosition(new Position(i, j)));
+				this.lesCases[i][j].setIcon(this.grid.getImageToPosition(new Position(i, j)));
 				this.panelCases.add(this.lesCases[i][j]);
 			}
 		}
@@ -118,7 +119,8 @@ public class GridView extends JFrame implements Observer, ActionListener {
 	
 		for ( int i = 0 ; i < Grid.N ; i ++ ) {
 			for ( int j = 0 ; j < Grid.N ; j ++ ) {
-				this.lesCases[i][j].setText(grid.getSigleToPosition(new Position(i, j)));
+				//this.lesCases[i][j].setText(grid.getSigleToPosition(new Position(i, j)));
+				this.lesCases[i][j].setIcon(this.grid.getImageToPosition(new Position(i, j)));
 			}
 		}
 	}
