@@ -1,34 +1,27 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 
 public class Agent extends Thread {
 
 	private int idNumber;
-	private Grid grid;
+	public static Grid GRID;
 	private Position finalPosition;
 	private Position currentPosition;
 	private Position virtualPosition;
+	private Position forbiddenPostion;
 	private String sigle;
 	private ImageIcon image;
 
-	public Agent(Grid p_grid, int p_idNumber, String p_sigle, Position p_pos_i, Position p_pos_f, ImageIcon p_image) {
+	public Agent(int p_idNumber, String p_sigle, Position p_pos_i, Position p_pos_f, ImageIcon p_image) {
 		setIdNumber(p_idNumber);
-		setGrid(p_grid);
 		setSigle(p_sigle);
 		setCurrentPosition(p_pos_i);
 		setFinalPosition(p_pos_f);
 		setImage(p_image);
 	}
-
-	private int facteurX() {
-		return this.getCurrentPosition().getX() - this.getFinalPosition().getX();
-	}
-
-	private int facteurY() {
-		return this.getCurrentPosition().getY() - this.getFinalPosition().getY();
-	}
-
+	
 	private int virtualFacteurX() {
 		return this.getVirtualPosition().getX() - this.getFinalPosition().getX();
 	}
@@ -36,53 +29,123 @@ public class Agent extends Thread {
 	private int virtualFacteurY() {
 		return this.getVirtualPosition().getY() - this.getFinalPosition().getY();
 	}
-
-	private ArrayList<Position> getPath() {
-		this.setVirtualPosition(new Position(this.currentPosition.getX(), this.currentPosition.getY()));
+	
+	private ArrayList<Position> getPathX() {
 		ArrayList<Position> positions = new ArrayList<Position>();
-
+		
 		while(virtualFacteurX() != 0) {
 			int increment = -virtualFacteurX()/Math.abs(virtualFacteurX());
 			this.virtualPosition.setX(this.virtualPosition.getX() + increment);
 
 			positions.add(new Position(this.virtualPosition.getX(), this.virtualPosition.getY()));
 		}
-
+		
+		return positions;
+	}
+	private ArrayList<Position> getPathY() {
+		ArrayList<Position> positions = new ArrayList<Position>();	
+		
 		while(virtualFacteurY() != 0) {
 			int increment = -virtualFacteurY()/Math.abs(virtualFacteurY());
 			this.virtualPosition.setY(this.virtualPosition.getY() + increment);
 
 			positions.add(new Position(this.virtualPosition.getX(), this.virtualPosition.getY()));
 		}
-
+		
 		return positions;
+	}
+
+	private ArrayList<Position> getPath() {
+		this.setVirtualPosition(new Position(this.currentPosition.getX(), this.currentPosition.getY()));
+		ArrayList<Position> positions = new ArrayList<Position>();
+		
+		if(this.forbiddenPostion != null && this.forbiddenPostion.getX() != this.currentPosition.getX()) {
+			positions.addAll(this.getPathY());
+			positions.addAll(this.getPathX());
+		} else {
+			positions.addAll(this.getPathX());
+			positions.addAll(this.getPathY());
+		}
+		
+		return positions;
+	}
+	
+	private Position getNeightboorFreePosition(Position pos, ArrayList<Position> posToAvoid, Position need) {
+		
+		ArrayList<Position> posAvailable = new ArrayList<Position>(); 
+		Random r = new Random();
+		
+		if(need != null && !posToAvoid.contains(need)) {
+			if(!GRID.isOccupated(need)) return need;
+		}
+		
+		if(pos.getX() < Grid.N-1) {
+			Position posTemp = new Position(pos.getX()+1, pos.getY());
+			if(!GRID.isOccupated(posTemp))
+				posAvailable.add(posTemp);
+		}
+		
+		if(pos.getY() < Grid.N-1) {
+			Position posTemp = new Position(pos.getX(), pos.getY()+1);
+			if(!GRID.isOccupated(posTemp))
+				posAvailable.add(posTemp);
+		}
+
+		if(pos.getX() > 0) {
+			Position posTemp = new Position(pos.getX()-1, pos.getY());
+			if(!GRID.isOccupated(posTemp))
+				posAvailable.add(posTemp);
+		}
+		
+		if(pos.getY() > 0) {
+			Position posTemp = new Position(pos.getX(), pos.getY()-1);
+			if(!GRID.isOccupated(posTemp))
+				posAvailable.add(posTemp);
+		}
+		
+		posAvailable.removeAll(posToAvoid);
+		
+		if(posAvailable.size() == 0) {
+			return posToAvoid.get(r.nextInt(posToAvoid.size()));
+		}
+		
+		return posAvailable.get(r.nextInt(posAvailable.size()));
 	}
 
 	@Override
 	public void run() {
 		ArrayList<Position> path;
+		ArrayList<Position> positionsToAvoid = new ArrayList<Position>();
 
 		while(true) {
-			
 			path = getPath();
-			
-			
-			ArrayList<Message> messages = this.grid.getListBoxes().get(this.getIdNumber()).getListMessages();
-			for(Message msg : messages) {
+			positionsToAvoid.clear();
+
+			ArrayList<Message> messages = GRID.getListBoxes().get(this.getIdNumber()).getListMessages();
+			for(int i = 0; i < messages.size(); i++) {
+				Message msg = messages.get(i);
 				if(msg.isRead())
 					continue;
 
+				positionsToAvoid.add(msg.getPositionToAvoid());	
+
+				msg.setRead(true);
+			}
+			
+			if(positionsToAvoid.size() > 0) {
 				Position need = null;
-				if(path.size() > 0) need = path.get(0);
-				Position newPos = this.grid.getNeightboorFreePosition(this.getCurrentPosition(), msg.getPositionToAvoid(), need);
+
+				if(path.size() > 0) 
+					need = path.get(0);
+
+				Position newPos = this.getNeightboorFreePosition(this.getCurrentPosition(), positionsToAvoid, need);
 				if(newPos != null && need != newPos) {
 					path.add(0, newPos);
-					//System.out.println(this.getSigle()+" se déplace en "+newPos.getX()+":"+newPos.getY());
-					msg.setRead(true);
+					this.forbiddenPostion = this.getCurrentPosition();
 				}
+				//GRID.getListBoxes().get(this.getIdNumber()).removeReadMessages();
 			}
-			//this.grid.getListBoxes().get(this.getIdNumber()).removeReadMessages();
-			
+		
 			Position p2 = null;
 
 			if(path.size() > 0) {
@@ -90,14 +153,16 @@ public class Agent extends Thread {
 				if(path.size() > 1) 
 					p2 = path.get(1);
 
-				Agent neighbor = this.grid.moveAgent(this, p);
+				Agent neighbor = GRID.moveAgent(this, p);
 				if(neighbor != null) {
 					int index = neighbor.getIdNumber();
 					Message msg = new Message(this, neighbor, p2);
-					this.grid.getListBoxes().get(index).addMessage(msg);
+					GRID.getListBoxes().get(index).addMessage(msg);
+				} else {
+					this.forbiddenPostion = null;
 				}
 			}
-
+			
 			try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
 		}
 	}
@@ -111,11 +176,7 @@ public class Agent extends Thread {
 	}
 
 	public Grid getGrid() {
-		return grid;
-	}
-
-	public void setGrid(Grid grid) {
-		this.grid = grid;
+		return GRID;
 	}
 
 	public Position getFinalPosition() {

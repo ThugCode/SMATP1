@@ -18,7 +18,7 @@ public class Grid extends Observable {
 	private int moveCounter;
 	
 	public Grid() {
-		
+		Agent.GRID = this;
 		createAgents();
 		start();
 	}
@@ -64,7 +64,7 @@ public class Grid extends Observable {
 		ArrayList<Agent> arrayAgents = new ArrayList<Agent>();
 		ArrayList<MessageBox> arrayBoxes = new ArrayList<MessageBox>();
 		
-		int nbAgent = 15;
+		int nbAgent = 10;
 		
 		Random rand = new Random();
 		ArrayList<Position> finals = getFinalPositions();
@@ -78,7 +78,7 @@ public class Grid extends Observable {
 			ImageIcon tempImage = images.get(random);
 			finals.remove(tempPosition);
 			images.remove(tempImage);
-			arrayAgents.add(new Agent(this, i, Grid.SIGLES[i], new Position(x, y), tempPosition, tempImage));
+			arrayAgents.add(new Agent(i, Grid.SIGLES[i], new Position(x, y), tempPosition, tempImage));
 			arrayBoxes.add(new MessageBox(i));
 		}
 		
@@ -111,35 +111,6 @@ public class Grid extends Observable {
 		
 		this.setChanged();
 		this.notifyObservers();
-	}
-	
-	public synchronized Position getNeightboorFreePosition(Position pos, Position posToAvoid, Position need) {
-		
-		if(need != null && !need.equals(posToAvoid)) {
-			if(!isOccupated(need)) return need;
-		}
-		
-		if(pos.getX() < N-1) {
-			Position newPosition = new Position(pos.getX()+1, pos.getY());
-			if(!isOccupated(newPosition) && !newPosition.equals(posToAvoid)) return newPosition;
-		}
-		
-		if(pos.getY() < N-1) {
-			Position newPosition = new Position(pos.getX(), pos.getY()+1);
-			if(!isOccupated(newPosition) && !newPosition.equals(posToAvoid)) return newPosition;
-		}
-
-		if(pos.getX() > 0) {
-			Position newPosition = new Position(pos.getX()-1, pos.getY());
-			if(!isOccupated(newPosition) && !newPosition.equals(posToAvoid)) return newPosition;
-		}
-		
-		if(pos.getY() > 0) {
-			Position newPosition = new Position(pos.getX(), pos.getY()-1);
-			if(!isOccupated(newPosition) && !newPosition.equals(posToAvoid)) return newPosition;
-		}
-
-		return null;
 	}
 	
 	private void switchCases(Position pos1, Position pos2) {
