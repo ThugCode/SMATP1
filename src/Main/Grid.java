@@ -12,11 +12,13 @@ public class Grid extends Observable {
 	private ArrayList<Agent> listAgents;
 	private ArrayList<MessageBox> listBoxes;
 	private String imageName;
+	private int nbAgents;
 
 	public Grid() {
 		Agent.GRID = this;
 		
 		setImageName("cross.png");
+		setNbAgents(15);
 		
 		createAgents();
 		start();
@@ -55,6 +57,16 @@ public class Grid extends Observable {
 		}
 	}
 	
+	public boolean allAgentWellPlaced() {
+		
+		for(Agent agent : this.listAgents) {
+			if(!agent.getCurrentPosition().equals(agent.getFinalPosition()))
+				return false;
+		}
+		
+		return true;
+	}
+	
 	/***
 	 * Create all agents in the grid
 	 */
@@ -67,7 +79,7 @@ public class Grid extends Observable {
 		ArrayList<Position> finals = getFinalPositions();
 		ArrayList<ImageIcon> images = ImageCutter.getListImages(imageName);
 		
-		for(int i=0; i<Common.NB_AGENTS; i++) {
+		for(int i=0; i<this.nbAgents; i++) {
 			int x = (int) Math.ceil(i/Common.N);
 			int y = i%Common.N;
 			int random = rand.nextInt(finals.size()-1);
@@ -198,6 +210,14 @@ public class Grid extends Observable {
 		this.imageName = imageName;
 	}
 	
+	public int getNbAgents() {
+		return nbAgents;
+	}
+
+	public void setNbAgents(int nbAgents) {
+		this.nbAgents = nbAgents;
+	}
+
 	public String toString() {
 		
 		String retur = "";

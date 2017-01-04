@@ -11,15 +11,23 @@ import java.util.Observer;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import Main.Common;
 import Main.Grid;
 import Main.ImageCutter;
 import Main.Position;
 
-public class GridView extends JFrame implements Observer, ActionListener {
+public class GridView extends JFrame implements Observer, ActionListener, ChangeListener {
 	private static final long serialVersionUID = -6118846850213932379L;
 
 	private Grid grid;
@@ -33,6 +41,10 @@ public class GridView extends JFrame implements Observer, ActionListener {
 	private JButton newGame;
 	private JButton go;
 	private JButton quit;
+	
+	private Timer timer;
+	private JLabel timeLabel;
+	private int timeInt;
 
 	public GridView(Grid p_grid) {
 		
@@ -113,39 +125,78 @@ public class GridView extends JFrame implements Observer, ActionListener {
 		this.quit = new JButton("Quitter");
 		this.quit.addActionListener(this);
 		
+		SpinnerModel spinnerModel = new SpinnerNumberModel(grid.getNbAgents(), 3, Common.N*Common.N, 1);
+		JSpinner spinner = new JSpinner(spinnerModel);
+		spinner.setFont(new Font("Arial", Font.PLAIN, 20));
+		spinner.addChangeListener(this);
+		
+		this.timer = new Timer(1000, this);
+		this.timer.setInitialDelay(1);
+        
+        this.timeLabel = new JLabel("0 : 0");
+        this.timeLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+        this.timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		
 		this.panelButtons = new JPanel();
-		this.panelButtons.setBounds(Common.IMAGE_SIZE+50, 20, 100, 200);
-		this.panelButtons.setLayout(new GridLayout(3,1,40,20));
+		this.panelButtons.setBounds(Common.IMAGE_SIZE+50, 100, 100, 400);
+		this.panelButtons.setLayout(new GridLayout(5,1,40,20));
 		this.panelButtons.add(go);
 		this.panelButtons.add(newGame);
 		this.panelButtons.add(quit);
+		this.panelButtons.add(spinner);
+		this.panelButtons.add(timeLabel);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == this.newGame) {
 			this.grid.suspendAgents();
+			this.timer.stop();
+			
 			this.grid.reset();
+			this.timeInt = 0;
+			this.timeLabel.setText( "0 : 0" );
+			
 			this.go.setText("Lancer");
 			this.go.setActionCommand("0");
+			
 		} else if(e.getSource() == this.go) {
 			if(this.go.getActionCommand() == "0") {
 				this.go.setText("Pause");
 				this.go.setActionCommand("1");
 				this.grid.startAgents();
+				timer.start();
 			} else if(this.go.getActionCommand() == "1") {
 				this.go.setText("Reprendre");
 				this.go.setActionCommand("2");
 				this.grid.suspendAgents();
+				this.timer.stop();
 			} else if(this.go.getActionCommand() == "2") {
 				this.go.setText("Pause");
 				this.go.setActionCommand("1");
 				this.grid.resumeAgents();
+				timer.start();
 			}
 			
 		} else if(e.getSource() == this.quit) {
 			System.exit(0);
+			
+		} else if(e.getSource() == this.timer) {
+			timeInt++;
+			String time = (int)Math.ceil(timeInt/60)+" : "+timeInt%60;
+			timeLabel.setText( time );
+			
+			if(grid.allAgentWellPlaced()) {
+				this.grid.suspendAgents();
+				this.timer.stop();
+				JOptionPane.showMessageDialog(null, "Terminé en "+(int)Math.ceil(timeInt/60)+" min et "+timeInt%60+" s");
+			}
 		}
+	}
+	
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		grid.setNbAgents((int)((JSpinner)e.getSource()).getValue());
 	}
 
 	@Override

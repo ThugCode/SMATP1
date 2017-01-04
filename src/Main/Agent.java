@@ -75,8 +75,9 @@ public class Agent extends Thread {
 	
 	private Position getNeightboorFreePosition(Position pos, ArrayList<Position> posToAvoid, Position need) {
 		
-		ArrayList<Position> posAvailable = new ArrayList<Position>(); 
 		Random rand = new Random();
+		ArrayList<Position> posAvailable = new ArrayList<Position>();
+		ArrayList<Position> allPosition = new ArrayList<Position>();
 		
 		if(need != null && !posToAvoid.contains(need)) {
 			if(!GRID.isOccupated(need)) return need;
@@ -84,35 +85,43 @@ public class Agent extends Thread {
 		
 		if(pos.getX() < Common.N-1) {
 			Position posTemp = new Position(pos.getX()+1, pos.getY());
+			allPosition.add(posTemp);
 			if(!GRID.isOccupated(posTemp))
 				posAvailable.add(posTemp);
 		}
 		
 		if(pos.getY() < Common.N-1) {
 			Position posTemp = new Position(pos.getX(), pos.getY()+1);
+			allPosition.add(posTemp);
 			if(!GRID.isOccupated(posTemp))
 				posAvailable.add(posTemp);
 		}
 
 		if(pos.getX() > 0) {
 			Position posTemp = new Position(pos.getX()-1, pos.getY());
+			allPosition.add(posTemp);
 			if(!GRID.isOccupated(posTemp))
 				posAvailable.add(posTemp);
 		}
 		
 		if(pos.getY() > 0) {
 			Position posTemp = new Position(pos.getX(), pos.getY()-1);
+			allPosition.add(posTemp);
 			if(!GRID.isOccupated(posTemp))
 				posAvailable.add(posTemp);
 		}
 		
 		posAvailable.removeAll(posToAvoid);
-		
-		if(posAvailable.size() == 0) {
-			return posToAvoid.get(rand.nextInt(posToAvoid.size()));
+		if(posAvailable.size() > 0) {
+			return posAvailable.get(rand.nextInt(posAvailable.size()));
 		}
 		
-		return posAvailable.get(rand.nextInt(posAvailable.size()));
+		//allPosition.removeAll(posToAvoid);
+		if(allPosition.size() > 0) {
+			return allPosition.get(rand.nextInt(allPosition.size()));
+		}
+		
+		return posToAvoid.get(rand.nextInt(posToAvoid.size()));
 	}
 	
 	private ArrayList<Position> getMessages() {
@@ -146,6 +155,7 @@ public class Agent extends Thread {
 			int index = neighbor.getIdNumber();
 			Message msg = new Message(this, neighbor, p2);
 			GRID.getListBoxes().get(index).addMessage(msg);
+			trying = 0;
 		} else {
 			trying++;
 			if(trying > 5) {
@@ -166,6 +176,9 @@ public class Agent extends Thread {
 		ArrayList<Position> positionsToAvoid = new ArrayList<Position>();
 
 		while(true) {
+			
+			int wait = 250;
+			
 			path = getPath();
 			
 			positionsToAvoid = getMessages();
@@ -181,13 +194,14 @@ public class Agent extends Thread {
 					path.add(0, newPos);
 					this.forbiddenPostion = this.getCurrentPosition();
 				}
+				wait = 500;
 			}
 			
 			trying = tryMoving(path, trying);
 			
 			GRID.getListBoxes().get(this.getIdNumber()).removeReadMessages();
 			
-			try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+			try { Thread.sleep(wait); } catch (InterruptedException e) { e.printStackTrace(); }
 		}
 	}
 
