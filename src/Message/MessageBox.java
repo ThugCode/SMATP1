@@ -20,9 +20,9 @@ public class MessageBox {
 	}
 	
 	public void removeReadMessages() {
-		for(Message msg : listMessages) {
-			if(msg.isRead())
-				listMessages.remove(msg);
+		for(int i=0; i<listMessages.size(); i++) {
+			if(listMessages.get(i)!= null && listMessages.get(i).isRead())
+				listMessages.remove(listMessages.get(i));
 		}
 	}
 	

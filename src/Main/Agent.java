@@ -76,7 +76,7 @@ public class Agent extends Thread {
 	private Position getNeightboorFreePosition(Position pos, ArrayList<Position> posToAvoid, Position need) {
 		
 		ArrayList<Position> posAvailable = new ArrayList<Position>(); 
-		Random r = new Random();
+		Random rand = new Random();
 		
 		if(need != null && !posToAvoid.contains(need)) {
 			if(!GRID.isOccupated(need)) return need;
@@ -109,36 +109,71 @@ public class Agent extends Thread {
 		posAvailable.removeAll(posToAvoid);
 		
 		if(posAvailable.size() == 0) {
-			return posToAvoid.get(r.nextInt(posToAvoid.size()));
+			return posToAvoid.get(rand.nextInt(posToAvoid.size()));
 		}
 		
-		return posAvailable.get(r.nextInt(posAvailable.size()));
+		return posAvailable.get(rand.nextInt(posAvailable.size()));
+	}
+	
+	private ArrayList<Position> getMessages() {
+		
+		ArrayList<Position> positionsToAvoid = new ArrayList<Position>();
+		
+		ArrayList<Message> messages = GRID.getListBoxes().get(this.getIdNumber()).getListMessages();
+		for(int i = 0; i < messages.size(); i++) {
+			Message msg = messages.get(i);
+			if(msg==null || msg.isRead()) 
+				continue;
+			positionsToAvoid.add(msg.getPositionToAvoid());	
+			msg.setRead(true);
+		}
+		
+		return positionsToAvoid;
+	}
+	
+	private int tryMoving(ArrayList<Position> path, int trying) {
+
+		if(path.size() < 1)
+			return 0;
+			
+		Position p = path.get(0);
+		Position p2 = null;
+		if(path.size() > 1) 
+			p2 = path.get(1);
+
+		Agent neighbor = GRID.moveAgent(this, p);
+		if(neighbor != null) {
+			int index = neighbor.getIdNumber();
+			Message msg = new Message(this, neighbor, p2);
+			GRID.getListBoxes().get(index).addMessage(msg);
+		} else {
+			trying++;
+			if(trying > 5) {
+				System.out.println("Trying reset");
+				this.forbiddenPostion = null;
+				trying = 0;
+			}
+		}
+		
+		return trying;
 	}
 
 	@Override
 	public void run() {
+		
+		int trying = 0;
 		ArrayList<Position> path;
 		ArrayList<Position> positionsToAvoid = new ArrayList<Position>();
 
 		while(true) {
 			path = getPath();
-			positionsToAvoid.clear();
-
-			ArrayList<Message> messages = GRID.getListBoxes().get(this.getIdNumber()).getListMessages();
-			for(int i = 0; i < messages.size(); i++) {
-				Message msg = messages.get(i);
-				if(msg.isRead())
-					continue;
-
-				positionsToAvoid.add(msg.getPositionToAvoid());	
-
-				msg.setRead(true);
-			}
+			
+			positionsToAvoid = getMessages();
 			
 			if(positionsToAvoid.size() > 0) {
 				Position need = null;
 
-				if(path.size() > 0) 
+				if(path.size() > 0)
 					need = path.get(0);
 
 				Position newPos = this.getNeightboorFreePosition(this.getCurrentPosition(), positionsToAvoid, need);
@@ -146,28 +181,11 @@ public class Agent extends Thread {
 					path.add(0, newPos);
 					this.forbiddenPostion = this.getCurrentPosition();
 				}
-				else {
-					
-				}
-				//GRID.getListBoxes().get(this.getIdNumber()).removeReadMessages();
 			}
-		
-			Position p2 = null;
-
-			if(path.size() > 0) {
-				Position p = path.get(0);
-				if(path.size() > 1) 
-					p2 = path.get(1);
-
-				Agent neighbor = GRID.moveAgent(this, p);
-				if(neighbor != null) {
-					int index = neighbor.getIdNumber();
-					Message msg = new Message(this, neighbor, p2);
-					GRID.getListBoxes().get(index).addMessage(msg);
-				} else {
-					//this.forbiddenPostion = null;
-				}
-			}
+			
+			trying = tryMoving(path, trying);
+			
+			GRID.getListBoxes().get(this.getIdNumber()).removeReadMessages();
 			
 			try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
 		}
@@ -179,10 +197,6 @@ public class Agent extends Thread {
 
 	public void setIdNumber(int idNumber) {
 		this.idNumber = idNumber;
-	}
-
-	public Grid getGrid() {
-		return GRID;
 	}
 
 	public Position getFinalPosition() {
