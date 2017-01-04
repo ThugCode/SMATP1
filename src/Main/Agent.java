@@ -82,13 +82,13 @@ public class Agent extends Thread {
 			if(!GRID.isOccupated(need)) return need;
 		}
 		
-		if(pos.getX() < Grid.N-1) {
+		if(pos.getX() < Common.N-1) {
 			Position posTemp = new Position(pos.getX()+1, pos.getY());
 			if(!GRID.isOccupated(posTemp))
 				posAvailable.add(posTemp);
 		}
 		
-		if(pos.getY() < Grid.N-1) {
+		if(pos.getY() < Common.N-1) {
 			Position posTemp = new Position(pos.getX(), pos.getY()+1);
 			if(!GRID.isOccupated(posTemp))
 				posAvailable.add(posTemp);

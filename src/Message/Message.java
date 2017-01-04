@@ -1,6 +1,7 @@
 package Message;
 
 import Main.Agent;
+import Main.Common.typeMessage;
 import Main.Position;
 
 public class Message {
@@ -12,7 +13,7 @@ public class Message {
 	private Agent agentFrom;
 	private Agent agentTo;
 	private Position positionToAvoid;
-	private boolean response;
+	private typeMessage type;
 	
 	public Message(Agent p_agentFrom, Agent p_agentTo, Position p_positionToAvoid) {
 		
@@ -21,7 +22,6 @@ public class Message {
 		setAgentFrom(p_agentFrom);
 		setAgentTo(p_agentTo);
 		setPositionToLeave(p_positionToAvoid);
-		setResponse(false);
 		id++;
 	}
 
@@ -65,11 +65,11 @@ public class Message {
 		this.positionToAvoid = positionToAvoid;
 	}
 
-	public boolean isResponse() {
-		return response;
+	public typeMessage getType() {
+		return type;
 	}
 
-	public void setResponse(boolean response) {
-		this.response = response;
+	public void setType(typeMessage type) {
+		this.type = type;
 	}
 }

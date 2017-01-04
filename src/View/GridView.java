@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import Main.Common;
 import Main.Grid;
 import Main.ImageCutter;
 import Main.Position;
@@ -21,7 +22,6 @@ import Main.Position;
 public class GridView extends JFrame implements Observer, ActionListener {
 	private static final long serialVersionUID = -6118846850213932379L;
 
-	private static final int IMAGE_SIZE = 500;
 	private Grid grid;
 	private JLabel [][] blocks;
 	
@@ -42,7 +42,7 @@ public class GridView extends JFrame implements Observer, ActionListener {
 		
 		this.setTitle("SMA");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setBounds(0, 0, IMAGE_SIZE+160, IMAGE_SIZE+100);
+		this.setBounds(0, 0, Common.IMAGE_SIZE+160, Common.IMAGE_SIZE+100);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
 	}
@@ -60,14 +60,14 @@ public class GridView extends JFrame implements Observer, ActionListener {
 		panelResolve.add(panelBlocks);
 		
 		JLabel labelIcon = new JLabel(ImageCutter.getImageIcon(grid.getImageName()));
-		labelIcon.setBounds(10, 10, IMAGE_SIZE, IMAGE_SIZE);
+		labelIcon.setBounds(10, 10, Common.IMAGE_SIZE, Common.IMAGE_SIZE);
 		
 		panelSolution = new JPanel();
 		panelSolution.setLayout(null);
 		panelSolution.add(labelIcon);
 		
 		JTabbedPane jtp = new JTabbedPane();
-		jtp.setBounds(0, 10, IMAGE_SIZE+40, IMAGE_SIZE+65);
+		jtp.setBounds(0, 10, Common.IMAGE_SIZE+40, Common.IMAGE_SIZE+65);
 	    jtp.addTab("Jeu", panelResolve);
 	    jtp.addTab("Solution", panelSolution);
 	    
@@ -82,13 +82,13 @@ public class GridView extends JFrame implements Observer, ActionListener {
 	 */
 	public void createPanelBlocks()
 	{
-		this.blocks = new JLabel[Grid.N][Grid.N];
+		this.blocks = new JLabel[Common.N][Common.N];
 		this.panelBlocks = new JPanel();
-		this.panelBlocks.setBounds(10, 10, IMAGE_SIZE, IMAGE_SIZE);
-		this.panelBlocks.setLayout(new GridLayout(Grid.N,Grid.N,1,1));
+		this.panelBlocks.setBounds(10, 10, Common.IMAGE_SIZE, Common.IMAGE_SIZE);
+		this.panelBlocks.setLayout(new GridLayout(Common.N,Common.N,1,1));
 		
-		for ( int i = 0 ; i < Grid.N ; i ++ ) {
-			for ( int j = 0 ; j < Grid.N ; j ++ ) {
+		for ( int i = 0 ; i < Common.N ; i ++ ) {
+			for ( int j = 0 ; j < Common.N ; j ++ ) {
 				this.blocks[i][j] = new JLabel();
 				this.blocks[i][j].setFont(new Font("Arial", Font.PLAIN, 50));
 				//this.blocks[i][j].setText(this.grid.getSigleToPosition(new Position(i, j)));
@@ -114,7 +114,7 @@ public class GridView extends JFrame implements Observer, ActionListener {
 		this.quit.addActionListener(this);
 		
 		this.panelButtons = new JPanel();
-		this.panelButtons.setBounds(IMAGE_SIZE+50, 20, 100, 200);
+		this.panelButtons.setBounds(Common.IMAGE_SIZE+50, 20, 100, 200);
 		this.panelButtons.setLayout(new GridLayout(3,1,40,20));
 		this.panelButtons.add(go);
 		this.panelButtons.add(newGame);
@@ -151,8 +151,8 @@ public class GridView extends JFrame implements Observer, ActionListener {
 	@Override
 	public void update(Observable o, Object arg) {
 	
-		for ( int i = 0 ; i < Grid.N ; i ++ ) {
-			for ( int j = 0 ; j < Grid.N ; j ++ ) {
+		for ( int i = 0 ; i < Common.N ; i ++ ) {
+			for ( int j = 0 ; j < Common.N ; j ++ ) {
 				//this.blocks[i][j].setText(grid.getSigleToPosition(new Position(i, j)));
 				this.blocks[i][j].setIcon(this.grid.getImageToPosition(new Position(i, j)));
 			}

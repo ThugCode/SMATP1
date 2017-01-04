@@ -9,14 +9,6 @@ import Message.MessageBox;
 
 public class Grid extends Observable {
 
-	public static final int N = 5;
-	public static final int NB_AGENTS = 20;
-	public static final String[] SIGLES = new String[] {"x", "o", "^", "$", "&", 
-														"w", "§", "!", "ç", "@", 
-														"<", "€", "*", "%", "?",
-														"#", "[", "]", "{", "}",
-														":", ".", "=", "+"};
-	
 	private ArrayList<Agent> listAgents;
 	private ArrayList<MessageBox> listBoxes;
 	private String imageName;
@@ -75,15 +67,15 @@ public class Grid extends Observable {
 		ArrayList<Position> finals = getFinalPositions();
 		ArrayList<ImageIcon> images = ImageCutter.getListImages(imageName);
 		
-		for(int i=0; i<Grid.NB_AGENTS; i++) {
-			int x = (int) Math.ceil(i/Grid.N);
-			int y = i%Grid.N;
+		for(int i=0; i<Common.NB_AGENTS; i++) {
+			int x = (int) Math.ceil(i/Common.N);
+			int y = i%Common.N;
 			int random = rand.nextInt(finals.size()-1);
 			Position tempPosition = finals.get(random);
 			ImageIcon tempImage = images.get(random);
 			finals.remove(tempPosition);
 			images.remove(tempImage);
-			arrayAgents.add(new Agent(i, Grid.SIGLES[i], new Position(x, y), tempPosition, tempImage));
+			arrayAgents.add(new Agent(i, Common.SIGLES[i], new Position(x, y), tempPosition, tempImage));
 			arrayBoxes.add(new MessageBox(i));
 		}
 		
@@ -95,8 +87,8 @@ public class Grid extends Observable {
 		
 		ArrayList<Position> list = new ArrayList<Position>();
 		
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<N;j++) {
+		for(int i=0;i<Common.N;i++) {
+			for(int j=0;j<Common.N;j++) {
 				list.add(new Position(i, j));
 			}
 		}
@@ -108,9 +100,9 @@ public class Grid extends Observable {
 		
 		Random rand = new Random();
 		
-		for(int i=0;i<Grid.N;i++) {
-			for(int j=0;j<Grid.N;j++) {
-				switchCases(new Position(i, j), new Position(rand.nextInt(Grid.N), rand.nextInt(Grid.N)));
+		for(int i=0;i<Common.N;i++) {
+			for(int j=0;j<Common.N;j++) {
+				switchCases(new Position(i, j), new Position(rand.nextInt(Common.N), rand.nextInt(Common.N)));
 			}
 		}
 		
@@ -210,8 +202,8 @@ public class Grid extends Observable {
 		
 		String retur = "";
 		
-		for(int i=0;i<Grid.N;i++) {
-			for(int j=0;j<Grid.N;j++) {
+		for(int i=0;i<Common.N;i++) {
+			for(int j=0;j<Common.N;j++) {
 				retur += "|"+this.getSigleToPosition(new Position(i, j))+"|";
 			}
 			retur += "\n";
@@ -225,8 +217,8 @@ public class Grid extends Observable {
 		String retur = "";
 		boolean print;
 		
-		for(int i=0;i<Grid.N;i++) {
-			for(int j=0;j<Grid.N;j++) {
+		for(int i=0;i<Common.N;i++) {
+			for(int j=0;j<Common.N;j++) {
 				print = false;
 				for(Agent agent : listAgents) {
 					if(agent.getFinalPosition().getX() == i
