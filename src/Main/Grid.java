@@ -1,12 +1,16 @@
+package Main;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
 
+import Message.MessageBox;
+
 public class Grid extends Observable {
 
 	public static final int N = 5;
+	public static final int NB_AGENTS = 20;
 	public static final String[] SIGLES = new String[] {"x", "o", "^", "$", "&", 
 														"w", "§", "!", "ç", "@", 
 														"<", "€", "*", "%", "?",
@@ -15,10 +19,13 @@ public class Grid extends Observable {
 	
 	private ArrayList<Agent> listAgents;
 	private ArrayList<MessageBox> listBoxes;
-	private int moveCounter;
-	
+	private String imageName;
+
 	public Grid() {
 		Agent.GRID = this;
+		
+		setImageName("cross.png");
+		
 		createAgents();
 		start();
 	}
@@ -64,13 +71,11 @@ public class Grid extends Observable {
 		ArrayList<Agent> arrayAgents = new ArrayList<Agent>();
 		ArrayList<MessageBox> arrayBoxes = new ArrayList<MessageBox>();
 		
-		int nbAgent = 10;
-		
 		Random rand = new Random();
 		ArrayList<Position> finals = getFinalPositions();
-		ArrayList<ImageIcon> images = ImageCutter.getListImages("smile.jpg");
+		ArrayList<ImageIcon> images = ImageCutter.getListImages(imageName);
 		
-		for(int i=0; i<nbAgent; i++) {
+		for(int i=0; i<Grid.NB_AGENTS; i++) {
 			int x = (int) Math.ceil(i/Grid.N);
 			int y = i%Grid.N;
 			int random = rand.nextInt(finals.size()-1);
@@ -192,13 +197,13 @@ public class Grid extends Observable {
 	public void setListBoxes(ArrayList<MessageBox> listBoxes) {
 		this.listBoxes = listBoxes;
 	}
-
-	public int getMoveCounter() {
-		return moveCounter;
+	
+	public String getImageName() {
+		return imageName;
 	}
 
-	public void setMoveCounter(int moveCounter) {
-		this.moveCounter = moveCounter;
+	public void setImageName(String imageName) {
+		this.imageName = imageName;
 	}
 	
 	public String toString() {

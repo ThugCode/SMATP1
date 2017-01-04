@@ -1,3 +1,4 @@
+package Main;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -6,6 +7,13 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 public class ImageCutter {
+
+	public static ImageIcon getImageIcon(String title) {
+		
+		File file = new File("");
+		Image source = new ImageIcon(file.getAbsoluteFile()+"/img/"+title).getImage();
+		return new ImageIcon(source.getScaledInstance(500, 500, Image.SCALE_SMOOTH));
+	}
 
 	public static ArrayList<ImageIcon> getListImages(String title) {
 		

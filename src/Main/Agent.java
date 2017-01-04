@@ -1,7 +1,10 @@
+package Main;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
+
+import Message.Message;
 
 public class Agent extends Thread {
 
@@ -143,6 +146,9 @@ public class Agent extends Thread {
 					path.add(0, newPos);
 					this.forbiddenPostion = this.getCurrentPosition();
 				}
+				else {
+					
+				}
 				//GRID.getListBoxes().get(this.getIdNumber()).removeReadMessages();
 			}
 		
@@ -159,7 +165,7 @@ public class Agent extends Thread {
 					Message msg = new Message(this, neighbor, p2);
 					GRID.getListBoxes().get(index).addMessage(msg);
 				} else {
-					this.forbiddenPostion = null;
+					//this.forbiddenPostion = null;
 				}
 			}
 			

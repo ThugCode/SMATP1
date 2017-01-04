@@ -1,3 +1,7 @@
+package Message;
+
+import Main.Agent;
+import Main.Position;
 
 public class Message {
 

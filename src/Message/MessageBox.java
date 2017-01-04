@@ -1,3 +1,4 @@
+package Message;
 import java.util.ArrayList;
 
 public class MessageBox {
