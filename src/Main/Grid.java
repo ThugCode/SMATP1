@@ -13,15 +13,16 @@ public class Grid extends Observable {
 	private ArrayList<MessageBox> listBoxes;
 	private String imageName;
 	private int nbAgents;
+	private int speed;
 
 	public Grid() {
 		Agent.GRID = this;
 		
 		setImageName("cross.png");
-		setNbAgents(15);
+		setNbAgents(18);
+		setSpeed(Common.WAIT_TIME_INIT);
 		
-		createAgents();
-		start();
+		reset();
 	}
 	
 	public void reset() {
@@ -32,11 +33,11 @@ public class Grid extends Observable {
 	public void start() {
 				
 		shuffleGrid();
-		
+		/*
 		System.out.println("Current Grid");
 		System.out.println(toString());
 		System.out.println("Final Grid");
-		System.out.println(toStringFinal());
+		System.out.println(toStringFinal());*/
 	}
 	
 	public void startAgents() {
@@ -57,6 +58,10 @@ public class Grid extends Observable {
 		}
 	}
 	
+	/***
+	 * Verify if all agents are at their final position
+	 * @return
+	 */
 	public boolean allAgentWellPlaced() {
 		
 		for(Agent agent : this.listAgents) {
@@ -76,7 +81,7 @@ public class Grid extends Observable {
 		ArrayList<MessageBox> arrayBoxes = new ArrayList<MessageBox>();
 		
 		Random rand = new Random();
-		ArrayList<Position> finals = getFinalPositions();
+		ArrayList<Position> finals = getAllPositions();
 		ArrayList<ImageIcon> images = ImageCutter.getListImages(imageName);
 		
 		for(int i=0; i<this.nbAgents; i++) {
@@ -95,7 +100,11 @@ public class Grid extends Observable {
 		setListBoxes(arrayBoxes);
 	}
 	
-	private ArrayList<Position> getFinalPositions() {
+	/***
+	 * Get all position of the grid
+	 * @return
+	 */
+	private ArrayList<Position> getAllPositions() {
 		
 		ArrayList<Position> list = new ArrayList<Position>();
 		
@@ -108,6 +117,9 @@ public class Grid extends Observable {
 		return list;
 	}
 
+	/***
+	 * Shuffle all agents in the grid
+	 */
 	private void shuffleGrid() {
 		
 		Random rand = new Random();
@@ -217,7 +229,16 @@ public class Grid extends Observable {
 	public void setNbAgents(int nbAgents) {
 		this.nbAgents = nbAgents;
 	}
+	
+	public int getSpeed() {
+		return speed;
+	}
 
+	public void setSpeed(int speed) {
+		this.speed = speed;
+	}
+	
+	/*
 	public String toString() {
 		
 		String retur = "";
@@ -255,4 +276,5 @@ public class Grid extends Observable {
 		
 		return retur;
 	}
+	*/
 }

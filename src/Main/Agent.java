@@ -16,6 +16,9 @@ public class Agent extends Thread {
 	private Position forbiddenPostion;
 	private String sigle;
 	private ImageIcon image;
+	
+	private int waitingTime;
+	private boolean waitOther;
 
 	public Agent(int p_idNumber, String p_sigle, Position p_pos_i, Position p_pos_f, ImageIcon p_image) {
 		setIdNumber(p_idNumber);
@@ -25,64 +28,76 @@ public class Agent extends Thread {
 		setImage(p_image);
 	}
 	
-	private int virtualFacteurX() {
-		return this.getVirtualPosition().getX() - this.getFinalPosition().getX();
-	}
-
-	private int virtualFacteurY() {
-		return this.getVirtualPosition().getY() - this.getFinalPosition().getY();
-	}
-	
-	private ArrayList<Position> getPathX() {
-		ArrayList<Position> positions = new ArrayList<Position>();
+	/***
+	 * Calculate all positions to go to final position on X axis
+	 * @return
+	 */
+	private ArrayList<Position> getPathX(ArrayList<Position> positions) {
 		
-		while(virtualFacteurX() != 0) {
-			int increment = -virtualFacteurX()/Math.abs(virtualFacteurX());
+		while(virtualGapX() != 0) {
+			int increment = -virtualGapX()/Math.abs(virtualGapX());
 			this.virtualPosition.setX(this.virtualPosition.getX() + increment);
 
 			positions.add(new Position(this.virtualPosition.getX(), this.virtualPosition.getY()));
 		}
-		
 		return positions;
 	}
-	private ArrayList<Position> getPathY() {
-		ArrayList<Position> positions = new ArrayList<Position>();	
+	
+	/***
+	 * Calculate all positions to go to final position on Y axis
+	 * @return
+	 */
+	private ArrayList<Position> getPathY(ArrayList<Position> positions) {
 		
-		while(virtualFacteurY() != 0) {
-			int increment = -virtualFacteurY()/Math.abs(virtualFacteurY());
+		while(virtualGapY() != 0) {
+			int increment = -virtualGapY()/Math.abs(virtualGapY());
 			this.virtualPosition.setY(this.virtualPosition.getY() + increment);
 
 			positions.add(new Position(this.virtualPosition.getX(), this.virtualPosition.getY()));
 		}
-		
 		return positions;
 	}
 
+	/***
+	 * Get path to final position
+	 * @return
+	 */
 	private ArrayList<Position> getPath() {
-		this.setVirtualPosition(new Position(this.currentPosition.getX(), this.currentPosition.getY()));
+		
 		ArrayList<Position> positions = new ArrayList<Position>();
 		
+		this.setVirtualPosition(new Position(this.currentPosition.getX(), this.currentPosition.getY()));
+		
 		if(this.forbiddenPostion != null && this.forbiddenPostion.getX() != this.currentPosition.getX()) {
-			positions.addAll(this.getPathY());
-			positions.addAll(this.getPathX());
+			positions = this.getPathY(positions);
+			positions = this.getPathX(positions);
 		} else {
-			positions.addAll(this.getPathX());
-			positions.addAll(this.getPathY());
+			positions = this.getPathX(positions);
+			positions = this.getPathY(positions);
 		}
 		
 		return positions;
 	}
 	
-	private Position getNeightboorFreePosition(Position pos, ArrayList<Position> posToAvoid, Position need) {
+	/***
+	 * Verify neighborhood to find best place to go
+	 * @param pos
+	 * @param posToAvoid
+	 * @param need
+	 * @return
+	 */
+	private Position getPositionToGo(Position pos, ArrayList<Position> posToAvoid, Position need) {
 		
 		Random rand = new Random();
 		ArrayList<Position> posAvailable = new ArrayList<Position>();
 		ArrayList<Position> allPosition = new ArrayList<Position>();
 		
+		//If needed position is not avoid, go for it
 		if(need != null && !posToAvoid.contains(need)) {
 			if(!GRID.isOccupated(need)) return need;
 		}
 		
+		//Verify right block
 		if(pos.getX() < Common.N-1) {
 			Position posTemp = new Position(pos.getX()+1, pos.getY());
 			allPosition.add(posTemp);
@@ -90,6 +105,7 @@ public class Agent extends Thread {
 				posAvailable.add(posTemp);
 		}
 		
+		//Verify down block
 		if(pos.getY() < Common.N-1) {
 			Position posTemp = new Position(pos.getX(), pos.getY()+1);
 			allPosition.add(posTemp);
@@ -97,6 +113,7 @@ public class Agent extends Thread {
 				posAvailable.add(posTemp);
 		}
 
+		//Verify left block
 		if(pos.getX() > 0) {
 			Position posTemp = new Position(pos.getX()-1, pos.getY());
 			allPosition.add(posTemp);
@@ -104,6 +121,7 @@ public class Agent extends Thread {
 				posAvailable.add(posTemp);
 		}
 		
+		//Verify up block
 		if(pos.getY() > 0) {
 			Position posTemp = new Position(pos.getX(), pos.getY()-1);
 			allPosition.add(posTemp);
@@ -111,20 +129,21 @@ public class Agent extends Thread {
 				posAvailable.add(posTemp);
 		}
 		
+		//Remove all position to avoid and then return a block
 		posAvailable.removeAll(posToAvoid);
 		if(posAvailable.size() > 0) {
 			return posAvailable.get(rand.nextInt(posAvailable.size()));
 		}
 		
-		//allPosition.removeAll(posToAvoid);
-		if(allPosition.size() > 0) {
-			return allPosition.get(rand.nextInt(allPosition.size()));
-		}
-		
-		return posToAvoid.get(rand.nextInt(posToAvoid.size()));
+		//If no block available go for a random block
+		return allPosition.get(rand.nextInt(allPosition.size()));
 	}
 	
-	private ArrayList<Position> getMessages() {
+	/***
+	 * Read message to move to let other agent get the block
+	 * @return
+	 */
+	private ArrayList<Position> readMessages() {
 		
 		ArrayList<Position> positionsToAvoid = new ArrayList<Position>();
 		
@@ -140,6 +159,12 @@ public class Agent extends Thread {
 		return positionsToAvoid;
 	}
 	
+	/***
+	 * Try moving or send message to other agent to get free block
+	 * @param path
+	 * @param trying
+	 * @return
+	 */
 	private int tryMoving(ArrayList<Position> path, int trying) {
 
 		if(path.size() < 1)
@@ -150,22 +175,62 @@ public class Agent extends Thread {
 		if(path.size() > 1) 
 			p2 = path.get(1);
 
+		//Try to move on the grid
 		Agent neighbor = GRID.moveAgent(this, p);
+		
+		//If not possible, send message
 		if(neighbor != null) {
 			int index = neighbor.getIdNumber();
 			Message msg = new Message(this, neighbor, p2);
 			GRID.getListBoxes().get(index).addMessage(msg);
 			trying = 0;
-		} else {
+		} 
+		else //Else increase trying
+		{
+			//If the agent moved for an other agent
+			//Wait other agent to get the block and leave it
+			if(this.waitOther) this.waitingTime = GRID.getSpeed()*2;
+			
 			trying++;
 			if(trying > 5) {
-				System.out.println("Trying reset");
 				this.forbiddenPostion = null;
 				trying = 0;
 			}
 		}
 		
 		return trying;
+	}
+	
+	/***
+	 * if agent can move to let a block free for an other agent, 
+	 * he will add a move on his path
+	 * @param path
+	 * @param positionsToAvoid
+	 * @return
+	 */
+	private ArrayList<Position> addMoveToAvoidPosition(ArrayList<Position> path, ArrayList<Position> positionsToAvoid) {
+		
+		if(positionsToAvoid.size() == 0)
+			return path;
+			
+		Position need = null;
+
+		if(path.size() > 0)
+			need = path.get(0);
+
+		Position newPos = this.getPositionToGo(this.getCurrentPosition(), positionsToAvoid, need);
+		
+		//If position to move is free and is not the next move
+		//Add move to path
+		if(newPos != null && need != newPos) {
+			path.add(0, newPos);
+			this.forbiddenPostion = this.getCurrentPosition();
+			this.waitOther = true;
+		}
+		
+		this.waitingTime = GRID.getSpeed()*2;
+		
+		return path;
 	}
 
 	@Override
@@ -177,31 +242,20 @@ public class Agent extends Thread {
 
 		while(true) {
 			
-			int wait = 250;
+			this.waitOther = false;
+			this.waitingTime = GRID.getSpeed();
 			
 			path = getPath();
 			
-			positionsToAvoid = getMessages();
+			positionsToAvoid = readMessages();
 			
-			if(positionsToAvoid.size() > 0) {
-				Position need = null;
-
-				if(path.size() > 0)
-					need = path.get(0);
-
-				Position newPos = this.getNeightboorFreePosition(this.getCurrentPosition(), positionsToAvoid, need);
-				if(newPos != null && need != newPos) {
-					path.add(0, newPos);
-					this.forbiddenPostion = this.getCurrentPosition();
-				}
-				wait = 500;
-			}
+			path = addMoveToAvoidPosition(path, positionsToAvoid);
 			
 			trying = tryMoving(path, trying);
 			
 			GRID.getListBoxes().get(this.getIdNumber()).removeReadMessages();
 			
-			try { Thread.sleep(wait); } catch (InterruptedException e) { e.printStackTrace(); }
+			try { Thread.sleep(this.waitingTime); } catch (InterruptedException e) { e.printStackTrace(); }
 		}
 	}
 
@@ -235,6 +289,14 @@ public class Agent extends Thread {
 
 	public void setVirtualPosition(Position virtualPosition) {
 		this.virtualPosition = virtualPosition;
+	}
+	
+	private int virtualGapX() {
+		return this.getVirtualPosition().getX() - this.getFinalPosition().getX();
+	}
+
+	private int virtualGapY() {
+		return this.getVirtualPosition().getY() - this.getFinalPosition().getY();
 	}
 
 	public String getSigle() {

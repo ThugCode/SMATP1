@@ -13,4 +13,6 @@ public class Common {
 														":", ".", "=", "+"};
 	
 	public static final int IMAGE_SIZE = 500;
+	
+	public static final int WAIT_TIME_INIT = 200;
 }

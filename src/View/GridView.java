@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.SpinnerModel;
@@ -42,9 +43,12 @@ public class GridView extends JFrame implements Observer, ActionListener, Change
 	private JButton go;
 	private JButton quit;
 	
+	private JSpinner spinnerNumber;
 	private Timer timer;
 	private JLabel timeLabel;
 	private int timeInt;
+	
+	private JSlider speedSlider;
 
 	public GridView(Grid p_grid) {
 		
@@ -125,10 +129,10 @@ public class GridView extends JFrame implements Observer, ActionListener, Change
 		this.quit = new JButton("Quitter");
 		this.quit.addActionListener(this);
 		
-		SpinnerModel spinnerModel = new SpinnerNumberModel(grid.getNbAgents(), 3, Common.N*Common.N, 1);
-		JSpinner spinner = new JSpinner(spinnerModel);
-		spinner.setFont(new Font("Arial", Font.PLAIN, 20));
-		spinner.addChangeListener(this);
+		SpinnerModel spinnerModel = new SpinnerNumberModel(grid.getNbAgents(), 3, Common.N*Common.N-1, 1);
+		spinnerNumber = new JSpinner(spinnerModel);
+		spinnerNumber.setFont(new Font("Arial", Font.PLAIN, 20));
+		spinnerNumber.addChangeListener(this);
 		
 		this.timer = new Timer(1000, this);
 		this.timer.setInitialDelay(1);
@@ -136,15 +140,19 @@ public class GridView extends JFrame implements Observer, ActionListener, Change
         this.timeLabel = new JLabel("0 : 0");
         this.timeLabel.setFont(new Font("Arial", Font.PLAIN, 20));
         this.timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        this.speedSlider = new JSlider(JSlider.HORIZONTAL,5,500,Common.WAIT_TIME_INIT);
+        this.speedSlider.addChangeListener(this);
 		
 		this.panelButtons = new JPanel();
 		this.panelButtons.setBounds(Common.IMAGE_SIZE+50, 100, 100, 400);
-		this.panelButtons.setLayout(new GridLayout(5,1,40,20));
+		this.panelButtons.setLayout(new GridLayout(6,1,40,20));
 		this.panelButtons.add(go);
 		this.panelButtons.add(newGame);
 		this.panelButtons.add(quit);
-		this.panelButtons.add(spinner);
+		this.panelButtons.add(spinnerNumber);
 		this.panelButtons.add(timeLabel);
+		this.panelButtons.add(speedSlider);
 	}
 	
 	@Override
@@ -196,7 +204,11 @@ public class GridView extends JFrame implements Observer, ActionListener, Change
 	
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		grid.setNbAgents((int)((JSpinner)e.getSource()).getValue());
+		if(e.getSource() == this.spinnerNumber) {
+			grid.setNbAgents((int)this.spinnerNumber.getValue());
+		} else if(e.getSource() == this.speedSlider) {
+			grid.setSpeed((int)this.speedSlider.getValue());
+		}
 	}
 
 	@Override
