@@ -183,19 +183,22 @@ public class Agent extends Thread {
 			int index = neighbor.getIdNumber();
 			Message msg = new Message(this, neighbor, p2);
 			GRID.getListBoxes().get(index).addMessage(msg);
-			trying = 0;
-		} 
-		else //Else increase trying
-		{
-			//If the agent moved for an other agent
-			//Wait other agent to get the block and leave it
-			if(this.waitOther) this.waitingTime = GRID.getSpeed()*2;
 			
 			trying++;
 			if(trying > 5) {
 				this.forbiddenPostion = null;
 				trying = 0;
 			}
+			
+		} 
+		else //Else reset trying
+		{
+			trying = 0;
+			
+			//If the agent moved for an other agent
+			//Wait more to let other agent get the block and leave it
+			if(this.waitOther) 
+				this.waitingTime = GRID.getSpeed()*2;
 		}
 		
 		return trying;
@@ -227,8 +230,6 @@ public class Agent extends Thread {
 			this.forbiddenPostion = this.getCurrentPosition();
 			this.waitOther = true;
 		}
-		
-		this.waitingTime = GRID.getSpeed()*2;
 		
 		return path;
 	}
