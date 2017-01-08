@@ -231,6 +231,8 @@ public class Agent extends Thread {
 			this.waitOther = true;
 		}
 		
+		this.waitingTime = GRID.getSpeed()*2;
+		
 		return path;
 	}
 
